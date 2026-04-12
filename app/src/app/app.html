@@ -1,0 +1,65 @@
+<h1>Formulario</h1>
+
+<form [formGroup]="form">
+  <label>Nombre:</label><br>
+  <input type="text" formControlName="name" placeholder="Escribe tu nombre"><br>
+
+  @if (form.get('name')?.errors?.['required'] && form.get('name')?.touched) {
+    <p>El nombre es obligatorio</p>
+  }
+
+  @if (form.get('name')?.errors?.['minlength'] && form.get('name')?.touched) {
+    <p>El nombre debe tener mínimo 3 letras</p>
+  }
+
+  <br>
+
+  <label>Email:</label><br>
+  <input type="email" formControlName="email" placeholder="Escribe tu email"><br>
+
+  @if (form.get('email')?.errors?.['required'] && form.get('email')?.touched) {
+    <p>El email es obligatorio</p>
+  }
+
+  @if (form.get('email')?.errors?.['email'] && form.get('email')?.touched) {
+    <p>El email no es válido</p>
+  }
+
+  <br>
+
+  <label>Edad:</label><br>
+  <input type="number" formControlName="age" placeholder="Escribe tu edad"><br>
+
+  @if (form.get('age')?.errors?.['required'] && form.get('age')?.touched) {
+    <p>La edad es obligatoria</p>
+  }
+
+  @if (form.get('age')?.errors?.['min'] && form.get('age')?.touched) {
+    <p>La edad debe ser mínimo 18</p>
+  }
+
+  <br>
+
+  <button type="button" (click)="addTask()" [disabled]="form.invalid">Enviar</button>
+</form>
+
+<h2>Lista de tareas</h2>
+
+<p>Cantidad total: {{ tasks.length }}</p>
+<p>Completadas: {{ completedTasksCount }}</p>
+
+<ul>
+  @for (task of tasks; track $index; let i = $index) {
+    <li>
+      <span [style.text-decoration]="task.completed ? 'line-through' : 'none'">
+        {{ task.title }}
+      </span>
+
+      <button type="button" (click)="toggleTask(i)">
+        {{ task.completed ? 'Desmarcar' : 'Completar' }}
+      </button>
+
+      <button type="button" (click)="deleteTask(i)">Eliminar</button>
+    </li>
+  }
+</ul>
