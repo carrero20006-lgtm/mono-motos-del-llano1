@@ -25,6 +25,23 @@ Para recrearla:
 2. Ir a SQL Editor
 3. Copiar y ejecutar el archivo `database.sql` incluido en el repositorio
 
+ ## Uso de Supabase
+
+El proyecto utiliza Supabase como base de datos en la nube.
+
+El archivo `database.sql` contiene la estructura necesaria para crear las tablas utilizadas por el sistema.
+
+Para revisar los datos registrados:
+
+1. Ingresar al proyecto de Supabase.
+2. Ir al menú lateral izquierdo.
+3. Seleccionar **Table Editor**.
+4. Abrir la tabla `app_users` para ver los usuarios registrados.
+5. Abrir la tabla `appointments` para ver las citas o reservas creadas.
+
+Cuando un usuario se registra desde la aplicación, su información se almacena en la tabla `app_users`.
+
+Cuando un cliente agenda una cita o reserva, la información se almacena en la tabla `appointments`.
 
 
 ##  Cómo ejecutar el proyecto
