@@ -15,12 +15,15 @@ La plataforma permite a los usuarios registrarse, iniciar sesión y acceder a di
 - Interfaz clara y fácil de usar
 
 
+##  Base de datos en Supabase
 
- Archivo de base de datos
+La base de datos fue desarrollada utilizando Supabase.
 
-El archivo `database.sql` incluido en el repositorio contiene la estructura de las tablas y los datos iniciales necesarios para el funcionamiento del sistema.
+Para recrearla:
 
-Este archivo permite recrear la base de datos en caso de ser necesario.
+1. Ingresar a Supabase
+2. Ir a SQL Editor
+3. Copiar y ejecutar el archivo `database.sql` incluido en el repositorio
 
 
 
