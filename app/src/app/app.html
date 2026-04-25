@@ -1,65 +1,287 @@
-<h1>Formulario</h1>
+@if (message) {
+  <div class="message" [class.error]="messageType === 'error'">
+    {{ message }}
+  </div>
+}
 
-<form [formGroup]="form">
-  <label>Nombre:</label><br>
-  <input type="text" formControlName="name" placeholder="Escribe tu nombre"><br>
+@if (!currentUser) {
+  <section class="login-screen">
+    <div class="auth-card">
+      <img [src]="logo" alt="Logo Mono Motos" class="auth-logo">
 
-  @if (form.get('name')?.errors?.['required'] && form.get('name')?.touched) {
-    <p>El nombre es obligatorio</p>
-  }
+      @if (!isRegisterMode) {
+        <h2>Ingreso de clientes</h2>
+        <p>Accede para solicitar y consultar servicios del taller.</p>
 
-  @if (form.get('name')?.errors?.['minlength'] && form.get('name')?.touched) {
-    <p>El nombre debe tener mínimo 3 letras</p>
-  }
+        <input type="email" placeholder="Correo electrónico" [(ngModel)]="loginEmail">
+        <input type="password" placeholder="Contraseña" [(ngModel)]="loginPassword">
 
-  <br>
+        <button type="button" (click)="login()">Ingresar</button>
 
-  <label>Email:</label><br>
-  <input type="email" formControlName="email" placeholder="Escribe tu email"><br>
+        <small>
+          Admin: <b>admin@mono.com</b> / <b>1234</b>
+        </small>
 
-  @if (form.get('email')?.errors?.['required'] && form.get('email')?.touched) {
-    <p>El email es obligatorio</p>
-  }
+        <p class="database-note">
+          Datos conectados a Supabase — base de datos real en la nube.
+        </p>
 
-  @if (form.get('email')?.errors?.['email'] && form.get('email')?.touched) {
-    <p>El email no es válido</p>
-  }
+        <a (click)="isRegisterMode = true">Crear cuenta de cliente</a>
+      }
 
-  <br>
+      @if (isRegisterMode) {
+        <h2>Registro de cliente</h2>
+        <p>Crea tu cuenta para agendar servicios.</p>
 
-  <label>Edad:</label><br>
-  <input type="number" formControlName="age" placeholder="Escribe tu edad"><br>
+        <input type="text" placeholder="Nombre completo" [(ngModel)]="registerName">
+        <input type="email" placeholder="Correo electrónico" [(ngModel)]="registerEmail">
+        <input type="password" placeholder="Contraseña" [(ngModel)]="registerPassword">
 
-  @if (form.get('age')?.errors?.['required'] && form.get('age')?.touched) {
-    <p>La edad es obligatoria</p>
-  }
+        <button type="button" (click)="register()">Registrarme</button>
 
-  @if (form.get('age')?.errors?.['min'] && form.get('age')?.touched) {
-    <p>La edad debe ser mínimo 18</p>
-  }
+        <p class="database-note">
+          Tu cuenta se guardará en Supabase.
+        </p>
 
-  <br>
+        <a (click)="isRegisterMode = false">Ya tengo cuenta</a>
+      }
+    </div>
+  </section>
+}
 
-  <button type="button" (click)="addTask()" [disabled]="form.invalid">Enviar</button>
-</form>
+@if (currentUser) {
+  <div class="site">
+    <header class="navbar">
+      <div class="brand">
+        <img [src]="logo" alt="Logo Mono Motos">
+        <div>
+          <h1>Mono Motos del Llano</h1>
+          <p>{{ currentUser.role === 'admin' ? 'Panel administrador' : 'Portal de cliente' }}</p>
+        </div>
+      </div>
 
-<h2>Lista de tareas</h2>
+      <nav>
+        <a href="#inicio">Inicio</a>
+        <a href="#servicios">Servicios</a>
+        <a href="#agendar">Agendar</a>
+        <a href="#panel">Panel</a>
+        <a href="#contacto">Contacto</a>
+        <button type="button" class="logout-btn" (click)="logout()">Salir</button>
+      </nav>
+    </header>
 
-<p>Cantidad total: {{ tasks.length }}</p>
-<p>Completadas: {{ completedTasksCount }}</p>
+    <section id="inicio" class="hero">
+      <div class="hero-content">
+        <span class="badge">
+          {{ currentUser.role === 'admin' ? 'Administrador' : 'Cliente' }}: {{ currentUser.name }}
+        </span>
 
-<ul>
-  @for (task of tasks; track $index; let i = $index) {
-    <li>
-      <span [style.text-decoration]="task.completed ? 'line-through' : 'none'">
-        {{ task.title }}
-      </span>
+        <h2>Potencia, seguridad y estilo para tu moto</h2>
 
-      <button type="button" (click)="toggleTask(i)">
-        {{ task.completed ? 'Desmarcar' : 'Completar' }}
-      </button>
+        <p>
+          Agenda servicios, consulta el estado de tus solicitudes y recibe atención directa del taller.
+        </p>
 
-      <button type="button" (click)="deleteTask(i)">Eliminar</button>
-    </li>
-  }
-</ul>
+        <p class="hero-database">
+          Sistema desarrollado en Angular con base de datos real en Supabase.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#servicios" class="btn primary">Ver servicios</a>
+          <a href="#panel" class="btn secondary">Ver mi panel</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="servicios" class="services-section">
+      <div class="section-title">
+        <span>Catálogo</span>
+        <h2>Servicios</h2>
+        <p>
+          Selecciona un servicio para iniciar el agendamiento. Cada opción se guarda como una solicitud real.
+        </p>
+      </div>
+
+      <div class="services-grid">
+        @for (service of services; track service.id) {
+          <article class="service-card" (click)="selectService(service.name)">
+            <img [src]="logo" alt="Logo Mono Motos">
+
+            <div>
+              <h3>{{ service.name }}</h3>
+              <p>{{ service.description }}</p>
+
+              <div class="service-meta">
+                <span>{{ service.price }}</span>
+                <span>{{ service.time }}</span>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section id="agendar" class="booking-section">
+      <div class="section-title dark">
+        <span>Agendamiento</span>
+        <h2>Solicitar servicio</h2>
+        <p>Completa los datos para registrar tu cita en Supabase.</p>
+      </div>
+
+      <div class="booking-card">
+        <div class="field">
+          <label>Servicio seleccionado</label>
+          <select [(ngModel)]="selectedService">
+            <option value="">Selecciona un servicio</option>
+
+            @for (service of services; track service.id) {
+              <option [value]="service.name">{{ service.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="two-columns">
+          <div class="field">
+            <label>Fecha</label>
+            <input type="date" [(ngModel)]="appointmentDate">
+          </div>
+
+          <div class="field">
+            <label>Hora</label>
+            <input type="time" [(ngModel)]="appointmentTime">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Moto</label>
+          <input type="text" placeholder="Ej: Yamaha FZ 2.0" [(ngModel)]="motorcycle">
+        </div>
+
+        <div class="field">
+          <label>Descripción del problema</label>
+          <textarea placeholder="Describe brevemente qué necesita tu moto" [(ngModel)]="problemDescription"></textarea>
+        </div>
+
+        <button type="button" class="main-btn" (click)="createAppointment()">Registrar cita</button>
+      </div>
+    </section>
+
+    <section id="panel" class="admin-section">
+      <div class="section-title">
+        <span>{{ currentUser.role === 'admin' ? 'Administrador' : 'Cliente' }}</span>
+        <h2>{{ currentUser.role === 'admin' ? 'Panel de control' : 'Mis servicios' }}</h2>
+        <p>
+          {{ currentUser.role === 'admin'
+            ? 'Gestiona todas las solicitudes del taller.'
+            : 'Consulta el estado de tus servicios registrados.' }}
+        </p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <strong>{{ totalAppointments }}</strong>
+          <span>Total</span>
+        </div>
+
+        <div class="stat-card pending">
+          <strong>{{ pendingAppointments }}</strong>
+          <span>Pendientes</span>
+        </div>
+
+        <div class="stat-card process">
+          <strong>{{ processAppointments }}</strong>
+          <span>En proceso</span>
+        </div>
+
+        <div class="stat-card done">
+          <strong>{{ finishedAppointments }}</strong>
+          <span>Finalizados</span>
+        </div>
+      </div>
+
+      <div class="filters">
+        <input type="text" placeholder="Buscar por cliente, servicio o moto" [(ngModel)]="searchText">
+
+        <select [(ngModel)]="statusFilter">
+          <option>Todos</option>
+          <option>Pendiente</option>
+          <option>En proceso</option>
+          <option>Finalizado</option>
+        </select>
+      </div>
+
+      @if (visibleAppointments.length === 0) {
+        <div class="empty">
+          <h3>No hay citas registradas</h3>
+          <p>Cuando se registren servicios, aparecerán aquí.</p>
+        </div>
+      }
+
+      <div class="appointment-list">
+        @for (appointment of visibleAppointments; track appointment.id) {
+          <article class="appointment-card">
+            <div>
+              <span
+                class="status"
+                [class.pending]="appointment.status === 'Pendiente'"
+                [class.process]="appointment.status === 'En proceso'"
+                [class.done]="appointment.status === 'Finalizado'">
+                {{ appointment.status }}
+              </span>
+
+              <h3>{{ appointment.service }}</h3>
+
+              <p><b>Cliente:</b> {{ appointment.client_name }}</p>
+              <p><b>Email:</b> {{ appointment.client_email }}</p>
+              <p><b>Moto:</b> {{ appointment.motorcycle }}</p>
+              <p><b>Fecha:</b> {{ appointment.date }} - {{ appointment.time }}</p>
+              <p><b>Detalle:</b> {{ appointment.description }}</p>
+            </div>
+
+            @if (currentUser.role === 'admin') {
+              <div class="appointment-actions">
+                <button type="button" (click)="updateStatus(appointment.id, 'Pendiente')">
+                  Pendiente
+                </button>
+
+                <button type="button" (click)="updateStatus(appointment.id, 'En proceso')">
+                  En proceso
+                </button>
+
+                <button type="button" (click)="updateStatus(appointment.id, 'Finalizado')">
+                  Finalizado
+                </button>
+
+                <button type="button" class="delete-btn" (click)="deleteAppointment(appointment.id)">
+                  Eliminar
+                </button>
+              </div>
+            }
+          </article>
+        }
+      </div>
+    </section>
+
+    <section id="contacto" class="contact-section">
+      <div class="section-title">
+        <span>Contacto</span>
+        <h2>Agenda tu servicio</h2>
+        <p>Comunícate directamente con el taller.</p>
+      </div>
+
+      <div class="contact-grid">
+        <a href="https://www.google.com/maps/search/?api=1&query=Cra+16+%232618+Dosmil+Bajo" target="_blank">
+          📍 Ver ubicación en Google Maps
+        </a>
+
+        <a href="https://wa.me/573122467243" target="_blank">
+          📲 Escribir por WhatsApp
+        </a>
+
+        <a href="mailto:monomotosdelllano@gmail.com">
+          ✉️ Enviar correo
+        </a>
+      </div>
+    </section>
+  </div>
+}
